@@ -12,18 +12,27 @@ from datetime import datetime
 
 class RabbitBackend(object):
 
-    def __init__(self, broker, user, passwd):
+    def __init__(self, broker, user, passwd, ca=None, client_cert=None, client_key=None):
         host, port = broker.split(":")
         self.host = host
         self.port = int(port)
         self.user = user
         self.passwd = passwd
         self.credentials = pika.PlainCredentials(self.user, self.passwd)
+        self.ca = ca
+        self.client_cert = client_cert
+        self.client_key = client_key
 
     def get_connection(self, vhost="/"):
-        context = ssl.create_default_context()
-        context.check_hostname = False
-        context.verify_mode = ssl.CERT_NONE
+        if self.ca:
+            context = ssl.create_default_context(cafile=self.ca)
+            ccontext.verify_mode = ssl.CERT_REQUIRED
+        else:
+            context = ssl.create_default_context()
+            context.check_hostname = False
+            context.verify_mode = ssl.CERT_NONE
+        if self.client_cert and self.client_key:
+            context.load_cert_chain(certfile=self.client_cert, keyfile=self.client_key)
         return pika.BlockingConnection(pika.ConnectionParameters(
             self.host,
             self.port,
@@ -37,8 +46,12 @@ backend = RabbitBackend(
     broker=os.environ["PWP_RABBIT_URI"],
     user=os.environ["PWP_RABBIT_USER"],
     passwd=os.environ["PWP_RABBIT_PASSWD"]
+    ca=os.environ.get("CA_CERT"),
+    client_cert=os.environ.get("PWP_RABBIT_CLIENT_CERT"),   
+    client_key=os.environ.get("PWP_RABBIT_CLIENT_KEY")
 )
 api_key = os.environ["PWP_API_KEY"]
+api_ca_certificate =os.environ.get("CA_CERT")
 
 
 def generate_certificate(salt):
@@ -104,7 +117,7 @@ def handle_task(channel, method, properties, body):
                 headers={
                     "Pwp-Api-Key": api_key
                 },
-                verify=False
+                verify=api_ca_certificate if api_ca_certificate else False
             )
     
         if resp.status_code != 201:
