@@ -45,7 +45,7 @@ class RabbitBackend(object):
 backend = RabbitBackend(
     broker=os.environ["PWP_RABBIT_URI"],
     user=os.environ["PWP_RABBIT_USER"],
-    passwd=os.environ["PWP_RABBIT_PASSWD"]
+    passwd=os.environ["PWP_RABBIT_PASSWD"],
     ca=os.environ.get("CA_CERT"),
     client_cert=os.environ.get("PWP_RABBIT_CLIENT_CERT"),   
     client_key=os.environ.get("PWP_RABBIT_CLIENT_KEY")
