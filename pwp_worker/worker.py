@@ -26,7 +26,7 @@ class RabbitBackend(object):
     def get_connection(self, vhost="/"):
         if self.ca:
             context = ssl.create_default_context(cafile=self.ca)
-            ccontext.verify_mode = ssl.CERT_REQUIRED
+            context.verify_mode = ssl.CERT_REQUIRED
         else:
             context = ssl.create_default_context()
             context.check_hostname = False
