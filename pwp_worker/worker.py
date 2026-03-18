@@ -1,4 +1,4 @@
-from dotenv import load_dotenv
+from datetime import datetime
 import hashlib
 import math
 import os
@@ -7,9 +7,10 @@ import sys
 import random
 import time
 import json
+
+from dotenv import load_dotenv
 import pika
 import requests
-from datetime import datetime
 
 load_dotenv(os.getenv("DOTENV_PATH"))
 
@@ -121,7 +122,6 @@ def handle_task(channel, method, properties, body):
                 headers={
                     "Pwp-Api-Key": api_key
                 },
-                verify=api_ca_certificate if api_ca_certificate else False
             )
     
         if resp.status_code != 201:
