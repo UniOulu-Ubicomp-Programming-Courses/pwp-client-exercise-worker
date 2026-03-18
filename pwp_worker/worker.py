@@ -1,3 +1,4 @@
+from dotenv import load_dotenv
 import hashlib
 import math
 import os
@@ -9,6 +10,9 @@ import json
 import pika
 import requests
 from datetime import datetime
+
+load_dotenv(os.getenv("DOTENV_PATH"))
+
 
 class RabbitBackend(object):
 
