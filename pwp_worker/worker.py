@@ -56,7 +56,6 @@ backend = RabbitBackend(
     client_key=os.environ.get("PWP_RABBIT_CLIENT_KEY")
 )
 api_key = os.environ["PWP_API_KEY"]
-api_ca_certificate =os.environ.get("CA_CERT")
 
 
 def generate_certificate(salt):
@@ -128,7 +127,10 @@ def handle_task(channel, method, properties, body):
             # log error 
             log_error(channel, f"Unable to send result")
         else:
-            send_notification(vhost, ns, res_ctrl)
+            try:
+                send_notification(vhost, ns, res_ctrl)
+            except pika.exceptions.ChannelClosedByBroker:
+                print("Failed to send notification")
     finally:
         # acknowledge the task regardless of outcome
         print("Task handled")
